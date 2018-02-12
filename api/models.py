@@ -63,6 +63,9 @@ class Type(models.Model):
     pluriel = models.CharField(max_length=100)
     blacklist = models.BooleanField(default=False, null=False, blank=True)
 
+    # Liens aux lieux
+    lieux = models.ManyToManyField(Lieu)
+
 
 class Horaire(models.Model):
     # Attributs
@@ -80,3 +83,6 @@ class Horaire(models.Model):
     jour = models.SmallIntegerField(choices=JOURS)
     open = models.SmallIntegerField(verbose_name="ouverture")
     close = models.SmallIntegerField(verbose_name="fermeture", default=0)
+
+    # Lien au lieu
+    lieu = models.ForeignKey(Lieu, on_delete=models.CASCADE)
