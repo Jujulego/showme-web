@@ -1,4 +1,9 @@
+# Extensions
 *.pyc
+
+# Dossiers
 venv/
 
+# Fichiers
+db.sqlite3
 showme/settings\.py
