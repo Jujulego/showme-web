@@ -17,7 +17,6 @@ class Migration(migrations.Migration):
                 ('nom', models.CharField(max_length=100)),
                 ('pluriel', models.CharField(max_length=100)),
                 ('blacklist', models.BooleanField(default=False)),
-                ('lieux', models.ManyToManyField(to='api.Lieu')),
             ],
         ),
     ]

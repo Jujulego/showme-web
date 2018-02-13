@@ -21,8 +21,9 @@ class Migration(migrations.Migration):
                 ('telephone', models.CharField(blank=True, default='', max_length=20, verbose_name='téléphone')),
                 ('note', models.FloatField(blank=True, null=True)),
                 ('site', models.URLField(blank=True, max_length=500, null=True)),
-                ('prix', models.SmallIntegerField(blank=True, choices=[(None, '----------'), (0, 'Gratuit'), (1, 'Bon marché'), (2, 'Modéré'), (3, 'Cher'), (4, 'Très cher')], default=None)),
+                ('prix', models.SmallIntegerField(blank=True, null=True, choices=[(None, '----------'), (0, 'Gratuit'), (1, 'Bon marché'), (2, 'Modéré'), (3, 'Cher'), (4, 'Très cher')], default=None)),
                 ('photo', models.ImageField(blank=True, max_length=500, null=True, upload_to='photos/')),
+                ('types', models.ManyToManyField(blank=True, to='api.Type')),
             ],
             options={
                 'verbose_name_plural': 'lieux',
