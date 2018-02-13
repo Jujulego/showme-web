@@ -11,6 +11,10 @@ class Type(models.Model):
     pluriel = models.CharField(max_length=100)
     blacklist = models.BooleanField(default=False, null=False, blank=True)
 
+    # Méthodes spéciales
+    def __str__(self):
+        return self.nom
+
 
 class Lieu(models.Model):
     # Attributs

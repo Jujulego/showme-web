@@ -1,0 +1,40 @@
+{
+  "id" : {{ lieu.id|stringformat:"d" }},
+  "nom": "{{ lieu.nom|escapejs }}",
+  "pos": {
+    "lat": {{ lieu.latitude|stringformat:"f" }},
+    "lng": {{ lieu.longitude|stringformat:"f" }}
+  },
+
+  "types": [{% with types=lieu.types.all %}
+    {% for t in types %}
+      {{ t.id|stringformat:"d" }}{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  {% endwith %}]
+
+  "adresse": {
+    "numero": "{{ lieu.adresse.numero|escapejs }}",
+    "route": "{{ lieu.adresse.route|escapejs }}",
+    "ville": "{{ lieu.adresse.ville|escapejs }}",
+    "departement": "{{ lieu.adresse.departement|escapejs }}",
+    "region": "{{ lieu.adresse.region|escapejs }}",
+    "pays": "{{ lieu.adresse.pays|escapejs }}"
+    "codepostal": "{{ lieu.adresse.codepostal|escapejs }}",
+  },
+
+  {% if lieu.telephone %}"telephone": "{{ lieu.telephone|escapejs }}",{% endif %}
+  {% if lieu.note %}"note": {{ lieu.note|stringformat:"f" }},{% endif %}
+  {% if lieu.site %}"site": "{{ lieu.site|escapejs }}",{% endif %}
+  {% if lieu.prix != None %}"prix": {{ lieu.prix }},{% endif %}
+
+  "horaires": [{% with horaires=lieu.horaires.all %}
+    {% for h in horaires %}
+    {
+      "id" : {{ h.id|stringformat:"d" }},
+      "jour": {{ h.jour|stringformat:"d" }},
+      "open": {{ h.open|stringformat:"d" }},
+      "close": {{ h.close|stringformat:"d" }}
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  {% endwith %}],
+}

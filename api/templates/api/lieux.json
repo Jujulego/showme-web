@@ -1,0 +1,3 @@
+[{% for lieu in lieux %}
+  {{ lieu.id|stringformat:"d" }}{% if not forloop.last %},{% endif %}
+{% endfor %}]

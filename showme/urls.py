@@ -26,6 +26,9 @@ urlpatterns = [
     # Administration
     path('admin/', admin.site.urls),
 
+    # Api
+    path('api/', include('api.urls')),
+
     # WagTail
     path('cms/',  include(wagtail_admin_urls)),
     path('docs/', include(wagtail_docs_urls)),

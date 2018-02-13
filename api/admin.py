@@ -7,6 +7,10 @@ from .models import *
 
 
 # Register your models here.
+class HoraireInlineAdmin(admin.TabularInline):
+    # Formulaire
+    model = Horaire
+
 @admin.register(Lieu)
 class LieuAdmin(OSMGeoAdmin):
     # Filtres
@@ -67,6 +71,8 @@ class LieuAdmin(OSMGeoAdmin):
             "classes": ("collapse",),
         })
     )
+
+    inlines = (HoraireInlineAdmin,)
 
     filter_horizontal = ("types",)
     readonly_fields = ("latitude", "longitude")

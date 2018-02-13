@@ -1,0 +1,6 @@
+{
+  "id": {{ type.id|stringformat:"d" }},
+  "nom": "{{ type.nom|escapejs }}",
+  "pluriel": "{{ type.pluriel|default:type.nom|escapejs }}",
+  "blacklist": {{ type.blacklist|lower }}
+}
