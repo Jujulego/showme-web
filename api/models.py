@@ -29,7 +29,7 @@ class Lieu(models.Model):
 
     # Champs obligatoires
     position = models.PointField(spatial_index=True)
-    nom = models.CharField(max_length=255, db_index=True, default="Inconnu", blank=True)
+    nom = models.CharField(max_length=255, db_index=True, default="Inconnu")
 
     # Champs additionnels
     telephone = models.CharField(max_length=20, default="", blank=True, verbose_name="téléphone")
@@ -57,9 +57,9 @@ class Lieu(models.Model):
     # Méthodes spéciales
     def __str__(self):
         if self.nom == "Inconnu":
-            return "<Lieu: lat={:.6f}, lng={:.6f}>".format(self.latitude, self.longitude)
+            return "<lat={:.6f}, lng={:.6f}>".format(self.latitude, self.longitude)
 
-        return "<Lieu: {:s}>".format(self.nom)
+        return self.nom
 
     # Méthodes
     def a_photo(self):

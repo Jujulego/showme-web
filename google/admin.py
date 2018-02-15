@@ -8,15 +8,22 @@ from .models import Type, Lieu
 @admin.register(Type)
 class TypeAdmin(admin.ModelAdmin):
     # Liste
-    list_display = ("name",)
-    search_fields = ("name",)
+    list_display = ("nom",)
+    search_fields = ("nom",)
 
     # Edition
-    fields = ("name", "api")
-    readonly_fields = ("name",)
+    fields = ("nom", "api")
+    readonly_fields = ("nom",)
 
 
 @admin.register(Lieu)
 class LieuAdmin(admin.ModelAdmin):
     # Liste
     list_display = ("lieu", "a_jour")
+    search_fields = ("lieu__nom",)
+
+    # Edition
+    fields = ("google_id", "lieu", "types")
+
+    filter_horizontal = ("types",)
+    readonly_fields = ("google_id",)

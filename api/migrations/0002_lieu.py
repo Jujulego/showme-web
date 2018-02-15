@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('position', django.contrib.gis.db.models.fields.PointField(srid=4326)),
-                ('nom', models.CharField(blank=True, db_index=True, default='Inconnu', max_length=255)),
+                ('nom', models.CharField(db_index=True, default='Inconnu', max_length=255)),
                 ('telephone', models.CharField(blank=True, default='', max_length=20, verbose_name='téléphone')),
                 ('note', models.FloatField(blank=True, null=True)),
                 ('site', models.URLField(blank=True, max_length=500, null=True)),
