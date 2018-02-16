@@ -1,5 +1,6 @@
 # Importations
 from django.contrib.gis.db import models
+from django.contrib.gis.geos import Point
 
 from . import pays
 
@@ -74,18 +75,10 @@ class Lieu(models.Model):
     def latitude(self):
         return self.position.y
 
-    @latitude.setter
-    def latitude(self, lat):
-        self.position.y = lat
-
     # - longitude
     @property
     def longitude(self):
         return self.position.x
-
-    @longitude.setter
-    def longitude(self, lng):
-        self.position.x = lng
 
 
 class Horaire(models.Model):

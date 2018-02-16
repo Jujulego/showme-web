@@ -2,6 +2,8 @@
 from datetime import datetime, timedelta, time
 
 from django.db import models
+from django.utils.formats import localize
+from django.utils.timezone import get_current_timezone
 
 
 # Modèles
@@ -28,6 +30,19 @@ class Log(models.Model):
     # Champs
     date = models.DateTimeField(auto_now_add=True, editable=False)
     type = models.SmallIntegerField(null=False, editable=False, choices=TYPES)
+
+    # Méthodes spéciales
+    def __str__(self):
+        return localize(self.date.astimezone(get_current_timezone()))
+
+    # Méthodes
+    @staticmethod
+    def type2text(t):
+        for v, txt in Log.TYPES:
+            if t == v:
+                return txt
+
+        return str(t)
 
 
 class Lieu(models.Model):

@@ -2,6 +2,7 @@
 from random import choice, random
 
 from django.conf import settings
+from django.contrib.gis.geos import Point
 from django.core.files.base import ContentFile
 from django.db import transaction
 
@@ -31,8 +32,38 @@ def random_point():
     return lat, lng
 
 
+def remplir_db(gmaps):
+    # Requêtes
+    resultat = gmaps.places_nearby(location=random_point(), radius=settings.MAPS["SEARCH_RADIUS"])
+    lieux = resultat.get("results", [])
+    suite = resultat.get("next_page_token", None)
+
+    while suite is not None:
+        resultat = gmaps.places_nearby(location=random_point(), radius=settings.MAPS["SEARCH_RADIUS"])
+        lieux.extend(resultat.get("results", []))
+        suite = resultat.get("next_page_token", None)
+
+    # Ajout des lieux
+    log = Log()
+    log.type = Log.RECHERCHE
+    log.save()
+
+    for donnees in lieux:
+        try:
+            lieu = Lieu.objects.get(google_id=donnees["place_id"])
+
+        except Lieu.DoesNotExist:
+            lieu = Lieu()
+            lieu.google_id = donnees["place_id"]
+            lieu.lieu = ApiLieu()
+
+        _maj(gmaps, lieu, donnees)
+
+        lieu.logs.add(log)
+
+
 @transaction.atomic
-def majLieu(gmaps, lieu):
+def maj_lieu(gmaps, lieu):
     # Requete
     donnees = gmaps.place(place_id=lieu.google_id, language=settings.MAPS["LANGUAGE"])
     donnees = donnees["result"]
@@ -56,32 +87,32 @@ def _maj(gmaps, lieu, donnees):
             lieu.lieu = ApiLieu()
 
     # Maj des infos
-    lieu.lieu.latitude = donnees["geometry"]["location"]["lat"]
-    lieu.lieu.longitude = donnees["geometry"]["location"]["lat"]
-    lieu.lieu.nom = donnees["name"]
+    api_lieu = lieu.lieu;
+    api_lieu.position = Point(donnees["geometry"]["location"]["lng"], donnees["geometry"]["location"]["lat"])
+    api_lieu.nom = donnees["name"]
 
-    lieu.lieu.telephone = donnees.get("international_phone_number", "")
-    lieu.lieu.note = donnees.get("rating", None)
-    lieu.lieu.site = donnees.get("website", None)
-    lieu.lieu.prix = donnees.get("price_level", None)
+    api_lieu.telephone = donnees.get("international_phone_number", "")
+    api_lieu.note = donnees.get("rating", None)
+    api_lieu.site = donnees.get("website", None)
+    api_lieu.prix = donnees.get("price_level", None)
 
     adresse = donnees.get("address_components", None)
     if adresse is not None:
         for p in adresse:
             if "street_number" in p["types"]:
-                lieu.lieu.numero = p["long_name"]
+                api_lieu.numero = p["long_name"]
             elif "route" in p["types"]:
-                lieu.lieu.route = p["long_name"]
+                api_lieu.route = p["long_name"]
             elif "locality" in p["types"]:
-                lieu.lieu.ville = p["long_name"]
+                api_lieu.ville = p["long_name"]
             elif "postal_code" in p["types"]:
-                lieu.lieu.codepostal = p["long_name"]
+                api_lieu.codepostal = p["long_name"]
             elif "administrative_area_level_2" in p["types"]:
-                lieu.lieu.departement = p["long_name"]
+                api_lieu.departement = p["long_name"]
             elif "administrative_area_level_1" in p["types"]:
-                lieu.lieu.region = p["long_name"]
+                api_lieu.region = p["long_name"]
             elif "country" in p["types"]:
-                lieu.lieu.pays = p["short_name"].upper()
+                api_lieu.pays = p["short_name"].upper()
 
     # Gestion de la photo
     photos = donnees.get("photo", None)
@@ -92,21 +123,24 @@ def _maj(gmaps, lieu, donnees):
             max_width=min(photo["width"], settings.MAPS["PHOTO_MAX_WIDTH"])
         )
 
-        lieu.lieu.photo.save(photo["photo_reference"], ContentFile(img))
-        lieu.lieu.save()
+        api_lieu.photo.save(photo["photo_reference"], ContentFile(img))
+        api_lieu.save()
 
     else:
         # Suppression du fichier
-        lieu.lieu.photo.delete()
+        api_lieu.photo.delete()
+
+    # Sauvegarde
+    api_lieu.save()
+
+    lieu.lieu = api_lieu
+    lieu.save()
 
     # Gestion des types
     types = [Type.objects.get_or_create(nom=nom)[0] for nom in donnees["types"]]
 
     lieu.types.set(types)
     lieu.lieu.types.set([t.api for t in types if t.api is not None])
-
-    lieu.lieu.save()
-    lieu.save()
 
     # Gestion des horaires
     Horaire.objects.filter(lieu=lieu.lieu).delete()
